@@ -31,7 +31,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = _("Etiqueta")
         verbose_name_plural = _("Etiquetas")
-        db_table = f'"{Schema.core}"."tag"'
+        db_table = f'"{Schema.inventory}"."tag"'
         db_table_comment = "Etiqueta: Almacena palabras clave o categorías que se pueden asociar a productos."
         
     def __str__(self):

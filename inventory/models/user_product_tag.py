@@ -54,7 +54,7 @@ class UserProductTag(AuditMixin):
     class Meta:
         verbose_name = _("UserProduct-Etiqueta")
         verbose_name_plural = _("UserProducts-Etiquetas")
-        db_table = f'"{Schema.core}"."user_product_tag"'
+        db_table = f'"{Schema.inventory}"."user_product_tag"'
         db_table_comment = "UserProduct-Etiqueta: Tabla intermedia para la relación muchos a muchos entre UserProducts y Etiquetas."
         constraints = [
             # Garantizar unicidad de la combinación UserProduct y Tag

@@ -27,5 +27,5 @@ class Conversation(AuditMixin):
     class Meta:
         verbose_name = _("Conversación")
         verbose_name_plural = _("Conversaciones")
-        db_table = f'"{Schema.chat}"."Conversation"'
+        db_table = f'"{Schema.chat}"."conversation"'
         db_table_comment = _("Conversación: almacena el título o cabecera de cada chat, el cual tiene relacionados múltiples detalles de conversación (ConversationDetail).")

@@ -52,5 +52,5 @@ class ConversationDetail(AuditMixin):
     class Meta:
         verbose_name = _("Detalle de Conversación")
         verbose_name_plural = _("Detalles de Conversación")
-        db_table = f'"{Schema.chat}"."Conversationdetail"'
+        db_table = f'"{Schema.chat}"."conversation_detail"'
         db_table_comment = _("Detalle del chat: registra el detalle de la conversación de cada chat")

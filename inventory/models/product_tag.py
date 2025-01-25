@@ -39,7 +39,7 @@ class ProductTag(AuditMixin):
     class Meta:
         verbose_name = _("Producto-Etiqueta")
         verbose_name_plural = _("Productos-Etiquetas")
-        db_table = f'"{Schema.core}"."product_tag"'
+        db_table = f'"{Schema.inventory}"."product_tag"'
         db_table_comment = "Producto-Etiqueta: Tabla intermedia para la relación muchos a muchos entre Productos y Etiquetas."
         constraints = [
             models.UniqueConstraint(

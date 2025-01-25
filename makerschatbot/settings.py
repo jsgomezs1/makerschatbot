@@ -82,14 +82,14 @@ WSGI_APPLICATION = 'makerschatbot.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "makerschatbot",
+        "NAME": "makers",
         "USER": "postgres",
         "PASSWORD": "admin",
         "HOST": "192.168.100.164",
         "PORT": "5432",
             'OPTIONS': {
     'options': (
-        f'-c search_path={Schema.core},{Schema.chat},{Schema.inventory} -c client_encoding=UTF8'
+        f'-c search_path={Schema.public},{Schema.core},{Schema.chat},{Schema.inventory} -c client_encoding=UTF8'
     )
 }
     }
