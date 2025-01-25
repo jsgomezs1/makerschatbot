@@ -2,13 +2,12 @@ from django.forms import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from core.models.user import User
 from inventory.models.product import Product
-from makerschatbot.clases.abstract.audit_mixin import AuditMixin
 from makerschatbot.variables.schemas import Schema
 from django.utils.translation import gettext_lazy as _ 
 from django.db import models
 import uuid
 
-class UserProduct(AuditMixin):
+class UserProduct(models.Model):
     """
     Modelo que representa un Producto personalizado para un Usuario.
 
