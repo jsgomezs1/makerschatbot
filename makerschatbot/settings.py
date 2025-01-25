@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-q7$4bjs)1w^3$o5-q))4jtx&+r*4rf+*cjk%$8xh%fs*k%l030
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'makerschatbot.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "makerschatbot",
+        "USER": "postgres",
+        "PASSWORD": "admin",
+        "HOST": "190.85.54.106",
+        "PORT": "5432",
     }
 }
 
