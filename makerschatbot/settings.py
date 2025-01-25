@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core',
+    'inventory',
+    'chat',
+    
 ]
 
 MIDDLEWARE = [
@@ -79,7 +83,7 @@ DATABASES = {
         "NAME": "makerschatbot",
         "USER": "postgres",
         "PASSWORD": "admin",
-        "HOST": "190.85.54.106",
+        "HOST": "192.168.100.164",
         "PORT": "5432",
     }
 }
