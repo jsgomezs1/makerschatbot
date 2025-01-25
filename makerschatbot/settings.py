@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+from makerschatbot.variables.schemas import Schema
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -85,6 +87,11 @@ DATABASES = {
         "PASSWORD": "admin",
         "HOST": "192.168.100.164",
         "PORT": "5432",
+            'OPTIONS': {
+    'options': (
+        f'-c search_path={Schema.core},{Schema.chat},{Schema.inventory} -c client_encoding=UTF8'
+    )
+}
     }
 }
 
