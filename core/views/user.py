@@ -4,6 +4,7 @@ from core.models.user import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta():
         model = User
+        fields = '__all__'
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
