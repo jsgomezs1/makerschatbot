@@ -23,7 +23,7 @@ def send_message(message, chat_history, chat_id=None):
     print(payload)
     headers = {"Content-Type": "application/json"}
     response = requests.post(chat_url, json=payload, headers=headers)
-    if response.status_code == 200:
+    if response.status_code == 201:
         bot_reply = response.json()["response"]
     else:
         bot_reply = f"Error:{response}"
