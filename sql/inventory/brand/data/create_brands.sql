@@ -1,36 +1,56 @@
 INSERT INTO inventory.brand (id, name, stakeholder_id)
 VALUES
--- Coca-Cola Brands
-(gen_random_uuid(), 'Coca-Cola', '9fdb173c-b4d2-4927-ae93-70c9d959e591'),
-(gen_random_uuid(), 'Sprite', '9fdb173c-b4d2-4927-ae93-70c9d959e591'),
-(gen_random_uuid(), 'Fanta', '9fdb173c-b4d2-4927-ae93-70c9d959e591'),
+-- Coca-Cola Brands (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a31', 'Coca-Cola', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a32', 'Sprite', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'Fanta', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
 
--- PepsiCo Brands
-(gen_random_uuid(), 'Pepsi', '47bec618-222b-4c52-b037-2cde153f269c'),
-(gen_random_uuid(), 'Mountain Dew', '47bec618-222b-4c52-b037-2cde153f269c'),
-(gen_random_uuid(), 'Lays', '47bec618-222b-4c52-b037-2cde153f269c'),
+-- PepsiCo Brands (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a34', 'Pepsi', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a35', 'Mountain Dew', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a36', 'Lays', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'),
 
--- Unilever Brands
-(gen_random_uuid(), 'Dove', 'd0d426fc-81b6-4f62-b9a7-dae8a2bed0eb'),
-(gen_random_uuid(), 'Axe', 'd0d426fc-81b6-4f62-b9a7-dae8a2bed0eb'),
-(gen_random_uuid(), 'Ben & Jerry''s', 'd0d426fc-81b6-4f62-b9a7-dae8a2bed0eb'),
+-- Unilever Brands (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a37', 'Dove', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a38', 'Axe', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a39', 'Ben & Jerry''s', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'),
 
--- Procter & Gamble Brands
-(gen_random_uuid(), 'Tide', '78a1b481-10f5-481d-b5cd-faab2472ec99'),
-(gen_random_uuid(), 'Gillette', '78a1b481-10f5-481d-b5cd-faab2472ec99'),
-(gen_random_uuid(), 'Oral-B', '78a1b481-10f5-481d-b5cd-faab2472ec99'),
+-- Procter & Gamble Brands (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a40', 'Tide', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a41', 'Gillette', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a42', 'Oral-B', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'),
 
--- Continue this pattern for other stakeholders...
-(gen_random_uuid(), 'Nescafé', '5e3adecd-d654-43aa-87b2-74df44354c4a'),
-(gen_random_uuid(), 'KitKat', '5e3adecd-d654-43aa-87b2-74df44354c4a'),
-(gen_random_uuid(), 'XPS', '074a90d2-e029-4f37-b720-0092537a8484'),
-(gen_random_uuid(), 'Alienware', '074a90d2-e029-4f37-b720-0092537a8484'),
-(gen_random_uuid(), 'Pavilion', 'c19c4101-58f8-4a19-ba88-5f0f0b6c51fd'),
-(gen_random_uuid(), 'Galaxy', '008252dd-58f0-4d11-99a5-245058c1ac93'),
-(gen_random_uuid(), 'PlayStation', 'ef2a89c8-07f8-413d-a136-989e5cfc6035'),
-(gen_random_uuid(), 'Air Max', '6fbe0d13-86b9-407b-8426-aff474e04cad'),
-(gen_random_uuid(), 'Ultraboost', 'c377c2f1-7ffd-4c1e-93a9-787dbaeb4b08'),
-(gen_random_uuid(), 'Maybelline', 'edc51ed2-a0ba-43cd-945a-6249a016e004'),
-(gen_random_uuid(), 'GE Appliances', '6df39ebe-d1ff-44c3-9338-b79e1e75543f'),
-(gen_random_uuid(), 'Hue Lighting', '0c7da739-3a9e-4079-bb58-8c47daed5e14'),
-(gen_random_uuid(), 'Core i9', '1d867a0d-db36-46f4-be00-105f5f50cb71');
+-- Nestlé S.A. (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a43', 'Nescafé', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'KitKat', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15'),
+
+-- Dell Technologies (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a16')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a45', 'XPS', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a16'),
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a46', 'Alienware', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a16'),
+
+-- HP Inc. (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a17')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a47', 'Pavilion', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a17'),
+
+-- Samsung Electronics (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a48', 'Galaxy', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18'),
+
+-- Sony Corporation (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a49', 'PlayStation', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19'),
+
+-- Nike, Inc. (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a20')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a50', 'Air Max', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a20'),
+
+-- Adidas AG (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a21')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a51', 'Ultraboost', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a21'),
+
+-- L''Oréal S.A. (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a52', 'Maybelline', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22'),
+
+-- General Electric (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a23')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a53', 'GE Appliances', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a23'),
+
+-- Philips (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a24')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a54', 'Hue Lighting', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a24'),
+
+-- Intel Corporation (Stakeholder ID: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a25')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'Core i9', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a25');

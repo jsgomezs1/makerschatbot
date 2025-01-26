@@ -11,6 +11,8 @@ from chat.models.prompt import Prompt
 from chat.models.chat import Chat
 from chat.models import Response as PromptResponse
 from core.models.user import User
+from inventory.models.inventory import Inventory
+from inventory.models.user_product import UserProduct
 
 
 class PromptSerializer(ModelSerializer):
@@ -60,9 +62,40 @@ def create_prompt(request):
     ).filter(
         prompt__chat=chat
     )
+    
+    
+    
 
     # 5. Build conversation messages (no 'system' role here)
     conversation_messages = []
+    
+    # available_products = Inventory.objects.get()
+    
+    # available_products = (
+    # Inventory.objects
+    # .filter(quantity__gt=0)
+    # .select_related('product')
+    # .values_list('quantity', 'product__name')
+    # )
+
+    # # Suppose we want a string where each "row" looks like: "Quantity: X - Product: Y"
+    # # and each row is separated by newline characters (or any other delimiter).
+    # available_products_string = ""
+    # for quantity, name in available_products:
+    #     available_products_string += f"Quantity: {quantity} - Product: {name}\n"
+    
+    # conversation_messages.append({
+    #     "role": "user",
+    #     "content": f'the available products are: {available_products_string}'
+    # })
+    
+    
+    
+    user_name = User.objects.get(id=created_by_id).name
+    conversation_messages.append({
+            "role": "user",
+            "content": f'my user name is: {user_name}'
+        })
     for item in history:
         # user prompt
         conversation_messages.append({

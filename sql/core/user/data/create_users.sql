@@ -1,4 +1,4 @@
--- Enable pgcrypto for UUID generation and password hashing
+-- Keep pgcrypto for password hashing
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 INSERT INTO core."user" 
@@ -6,7 +6,7 @@ INSERT INTO core."user"
 VALUES
 -- Reid Hoffman (LinkedIn)
 (
-    gen_random_uuid(),
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a26',  -- Fixed UUIDv4
     'Reid Hoffman',
     'https://example.com/avatars/linkedin-founder.jpg',
     'reid.hoffman@example.com',
@@ -18,7 +18,7 @@ VALUES
 
 -- Paul Graham (Y Combinator)
 (
-    gen_random_uuid(),
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a27',  -- Fixed UUIDv4
     'Paul Graham',
     'https://example.com/avatars/ycombinator-founder.png',
     'paul.graham@ycombinator.example',
@@ -30,7 +30,7 @@ VALUES
 
 -- Emmett Shear (Twitch)
 (
-    gen_random_uuid(),
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a28',  -- Fixed UUIDv4
     'Emmett Shear',
     'https://example.com/avatars/twitch-founder.jpg',
     'emmet.shear@example.com',
@@ -42,7 +42,7 @@ VALUES
 
 -- Sara Blakely (Spanx)
 (
-    gen_random_uuid(),
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a29',  -- Fixed UUIDv4
     'Sara Blakely',
     'https://example.com/avatars/spanx-founder.jpg',
     'sara.blakely@example.com',
@@ -54,7 +54,7 @@ VALUES
 
 -- Whitney Wolfe Herd (Bumble)
 (
-    gen_random_uuid(),
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a30',  -- Fixed UUIDv4
     'Whitney Wolfe Herd',
     'https://example.com/avatars/bumble-ceo.jpg',
     'whitney@bumble.example',
@@ -63,5 +63,3 @@ VALUES
     true,
     NOW()
 );
-
--- Remaining entrepreneurs follow the same pattern...
