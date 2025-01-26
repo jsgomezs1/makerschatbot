@@ -1,0 +1,2 @@
+sql=readsqlfile('core/user/stakeholder/create_stakeholders'),  
+reverse_sql=readsqlfile('core/stakeholder/data/delete_stakeholders')  

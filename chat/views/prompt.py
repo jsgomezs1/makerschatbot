@@ -1,69 +1,150 @@
 import os
-import uuid
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.serializers import ModelSerializer
-from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
+from anthropic import Anthropic
 
 from chat.models.prompt import Prompt
 from chat.models.chat import Chat
 from chat.models import Response as PromptResponse
 from core.models.user import User
-from django.core.serializers import serialize
+from inventory.models.inventory import Inventory
+from inventory.models.user_product import UserProduct
 
 
-# 1. Refine the serializer to only accept 'prompt'
 class PromptSerializer(ModelSerializer):
+    """
+    Only accepts 'prompt'. If your model requires `created_by` as part of
+    the payload, you can include it in fields or handle it in the view.
+    """
     class Meta:
         model = Prompt
-        fields = ("prompt","created_by")
+        fields = ("prompt",)
 
 
 @api_view(["POST"])
+@transaction.atomic
 def create_prompt(request):
+    """Create a new Prompt under an existing or new Chat."""
     serializer = PromptSerializer(data=request.data)
-    users = User.objects.all()
-    # Serializa los usuarios a JSON
-    users_json = serialize('json', users)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Imprime el JSON
-    print(users_json)
-    print(users)
-
-    if serializer.is_valid():
-        created_by = User.objects.get(id=request.data["created_by"])
-        chat = Chat.objects.create(name="New Chat", created_by=created_by)
-        prompt_instance = serializer.save(chat=chat)
-
-        api_key = os.getenv("ANTHROPIC_API_KEY")
-        anthropic = Anthropic(api_key=api_key)
-
-        try:
-            # Corrected API call using messages.create
-            response = anthropic.messages.create(
-                model="claude-3-haiku-20240307",
-                system="You are a helpful assistant.",  # System prompt as parameter
-                messages=[
-                    {"role": "user", "content": prompt_instance.prompt}  # User message
-                ],
-                max_tokens=100,  # Correct parameter name
-                temperature=0.7
-            )
-            
-            # Extract text content from response
-            response_content = response.content[0].text
-
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # Save the extracted response text
-        PromptResponse.objects.create(
-            prompt=prompt_instance,
-            content=response_content
+    # 1. Get the 'created_by' user
+    created_by_id = request.data.get("created_by")
+    if not created_by_id:
+        return Response(
+            {"detail": "created_by is required."},
+            status=status.HTTP_400_BAD_REQUEST
         )
+    created_by = get_object_or_404(User, id=created_by_id)
 
-        # Return the response content
-        return Response({"response": response_content}, status=status.HTTP_201_CREATED)
+    # 2. Attempt to get chat_id from request
+    chat_id = request.data.get("chat_id")
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if chat_id:
+        # Get existing chat; ensure it belongs to the user
+        chat = get_object_or_404(Chat, id=chat_id, created_by=created_by)
+    else:
+        # Create a new chat
+        chat = Chat.objects.create(name="New Chat", created_by=created_by)
+
+    # 3. Save the new Prompt (linking it to the Chat and user)
+    prompt_instance = serializer.save(chat=chat, created_by=created_by)
+
+    # 4. Fetch conversation history for the selected/new chat
+    history = PromptResponse.objects.select_related(
+        "prompt",
+        "prompt__chat"
+    ).filter(
+        prompt__chat=chat
+    )
+    
+    
+    
+
+    # 5. Build conversation messages (no 'system' role here)
+    conversation_messages = []
+    
+    # available_products = Inventory.objects.get()
+    
+    # available_products = (
+    # Inventory.objects
+    # .filter(quantity__gt=0)
+    # .select_related('product')
+    # .values_list('quantity', 'product__name')
+    # )
+
+    # # Suppose we want a string where each "row" looks like: "Quantity: X - Product: Y"
+    # # and each row is separated by newline characters (or any other delimiter).
+    # available_products_string = ""
+    # for quantity, name in available_products:
+    #     available_products_string += f"Quantity: {quantity} - Product: {name}\n"
+    
+    # conversation_messages.append({
+    #     "role": "user",
+    #     "content": f'the available products are: {available_products_string}'
+    # })
+    
+    
+    
+    user_name = User.objects.get(id=created_by_id).name
+    conversation_messages.append({
+            "role": "user",
+            "content": f'my user name is: {user_name}'
+        })
+    for item in history:
+        # user prompt
+        conversation_messages.append({
+            "role": "user",
+            "content": item.prompt.prompt
+        })
+        # assistant response
+        conversation_messages.append({
+            "role": "assistant",
+            "content": item.content
+        })
+
+    # 6. Append the new user prompt
+    conversation_messages.append({
+        "role": "user",
+        "content": prompt_instance.prompt
+    })
+
+    # 7. Prepare the Anthropic client
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    if not api_key:
+        return Response(
+            {"detail": "Anthropic API key not configured."},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    anthropic = Anthropic(api_key=api_key)
+
+    # 8. Call the Anthropic model
+    try:
+        response = anthropic.messages.create(
+            model="claude-3-haiku-20240307",
+            # Provide a top-level system message (if desired) rather than a 'system' role
+            system="You are a helpful assistant.",
+            messages=conversation_messages,
+            max_tokens=100,
+            temperature=0.7
+        )
+        response_content = response.content[0].text  # Adjust if necessary
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # 9. Save the new assistant response
+    PromptResponse.objects.create(
+        prompt=prompt_instance,
+        content=response_content
+    )
+
+    # 10. Return the assistant response & chat ID
+    return Response(
+        {"response": response_content, "chat_id": chat.id},
+        status=status.HTTP_201_CREATED
+    )
