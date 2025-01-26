@@ -28,7 +28,6 @@ class PromptSerializer(ModelSerializer):
 @api_view(["POST"])
 @transaction.atomic
 def create_prompt(request):
-    """Create a new Prompt under an existing or new Chat."""
     serializer = PromptSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -52,54 +51,53 @@ def create_prompt(request):
         # Create a new chat
         chat = Chat.objects.create(name="New Chat", created_by=created_by)
 
-    # 3. Save the new Prompt (linking it to the Chat and user)
+    # 3. Save the new Prompt
     prompt_instance = serializer.save(chat=chat, created_by=created_by)
 
-    # 4. Fetch conversation history for the selected/new chat
+    # 4. Fetch conversation history
     history = PromptResponse.objects.select_related(
         "prompt",
         "prompt__chat"
-    ).filter(
-        prompt__chat=chat
-    )
-    
-    
-    
+    ).filter(prompt__chat=chat)
 
-    # 5. Build conversation messages (no 'system' role here)
-    conversation_messages = [{
-        "role": "user",
-        "content": 'You are an AI chatbot designed to provide insights on the stock status of an inventory based on structured data. The inventory includes the following entities and relationships: Stakeholder: Represents stakeholders associated with brands (e.g., name).  Brand: Represents brands and their stakeholders (e.g., name, stakeholder). Tag: Represents tags that categorize or classify inventory items (e.g., name). Product Type: Represents categories of products (e.g., name). Product: Represents individual products linked to a brand and product type (e.g., name, brand, product type). Product Tag: Tags assigned to specific products for further categorization (e.g., name). Inventory: Represents stock levels for each product (e.g., product, quantity). Response Guidelines: Focus only on the specific query asked by the customer and provide clear, concise, and organized information. Group responses logically by stakeholder, brand, product type, or tag, depending on the query. Do not provide irrelevant information or speculate outside the dataset. Example Queries and Responses: Product-Specific Query: Query: "What is the stock quantity of [product name]?" Response: "There is a total of [quantity] unit of [product name] in stock" Brand-Specific Query: Query: "Show the inventory status for all products under [brand name]." Response: "Stock status of [brand name] products: [list of [product name]: [quantity]]" Tag-Specific Query: Query: "List all products tagged with [tag name] and their stock quantities." Response: "Products tagged with [tag name]: [product name]" Stakeholder-Specific Query: Query: "Show the inventory managed by [stakeholder name]." Response: "Inventory of [stakeholder name]: [list of brand and products]" Product Type Query: Query: "What is the total stock quantity of [product type]?" Response: "There are in stock [number of products] products of type [product type]"'
-    }]
-    
-    
-    available_products = Inventory.objects.get()
-    
+    # 5. Build conversation messages
+    conversation_messages = [
+        {
+            "role": "user",
+            "content": (
+                "You are an AI chatbot designed to provide insights on the stock "
+                "status of an inventory based on structured data ..."
+            )
+        }
+    ]
+
+    # **Remove** the get() that caused the error
+    # available_products = Inventory.objects.get()  # <-- Remove this line
+
+    # **Use a filtered QuerySet to get all inventory items with quantity > 0**
     available_products = (
-    Inventory.objects
-    .filter(quantity__gt=0)
-    .select_related('product')
-    .values_list('quantity', 'product__name')
+        Inventory.objects
+        .filter(quantity__gt=0)
+        .select_related('product')
+        .values_list('quantity', 'product__name')
     )
 
-    # Suppose we want a string where each "row" looks like: "Quantity: X - Product: Y"
-    # and each row is separated by newline characters (or any other delimiter).
+    # Build a string of available products
     available_products_string = ""
     for quantity, name in available_products:
         available_products_string += f"Quantity: {quantity} - Product: {name}\n"
-    
+
     conversation_messages.append({
         "role": "user",
-        "content": f'the available products are: {available_products_string}'
+        "content": f"The available products are: \n{available_products_string}"
     })
-    
-    
-    
-    user_name = User.objects.get(id=created_by_id).name
+
+    user_name = created_by.name
     conversation_messages.append({
-            "role": "user",
-            "content": f'my user name is: {user_name}'
-        })
+        "role": "user",
+        "content": f"My user name is: {user_name}"
+    })
+
     for item in history:
         # user prompt
         conversation_messages.append({
@@ -127,28 +125,26 @@ def create_prompt(request):
         )
     anthropic = Anthropic(api_key=api_key)
 
-    # 8. Call the Anthropic model
+    # 8. Call the Anthropic model (adjust model name, messages structure, etc. as needed)
     try:
         response = anthropic.messages.create(
             model="claude-3-haiku-20240307",
-            # Provide a top-level system message (if desired) rather than a 'system' role
             system="You are a helpful assistant.",
             messages=conversation_messages,
             max_tokens=100,
             temperature=0.7
         )
-        response_content = response.content[0].text  # Adjust if necessary
+        # The way you extract the response from 'response' may need adjustment
+        response_content = response.content[0].text
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # 9. Save the new assistant response
-    PromptResponse.objects.create(
-        prompt=prompt_instance,
-        content=response_content
-    )
+    PromptResponse.objects.create(prompt=prompt_instance, content=response_content)
 
     # 10. Return the assistant response & chat ID
     return Response(
         {"response": response_content, "chat_id": chat.id},
         status=status.HTTP_201_CREATED
     )
+
