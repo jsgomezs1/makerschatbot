@@ -10,6 +10,7 @@ from chat.models.prompt import Prompt
 from chat.models.chat import Chat
 from chat.models import Response as PromptResponse
 from core.models.user import User
+from django.core.serializers import serialize
 
 
 # 1. Refine the serializer to only accept 'prompt'
@@ -22,6 +23,13 @@ class PromptSerializer(ModelSerializer):
 @api_view(["POST"])
 def create_prompt(request):
     serializer = PromptSerializer(data=request.data)
+    users = User.objects.all()
+    # Serializa los usuarios a JSON
+    users_json = serialize('json', users)
+
+# Imprime el JSON
+    print(users_json)
+    print(users)
 
     if serializer.is_valid():
         created_by = User.objects.get(id=request.data["created_by"])
