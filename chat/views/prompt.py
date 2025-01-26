@@ -14,12 +14,18 @@ from core.models.user import User
 from inventory.models.inventory import Inventory
 from inventory.models.user_product import UserProduct
 
+# Assuming your ProductTag model is something like:
+# class ProductTag(models.Model):
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+#     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+
+# And Product -> Brand -> Stakeholder relationships are set up accordingly.
+
+from django.db.models import F
+from inventory.models.product_tag import ProductTag  # or wherever it is
+
 
 class PromptSerializer(ModelSerializer):
-    """
-    Only accepts 'prompt'. If your model requires `created_by` as part of
-    the payload, you can include it in fields or handle it in the view.
-    """
     class Meta:
         model = Prompt
         fields = ("prompt",)
@@ -55,28 +61,22 @@ def create_prompt(request):
     ).filter(prompt__chat=chat)
 
     # 5. Build conversation messages
-    #    (Keep your big "You are an AI chatbot..." in the system parameter,
-    #     or store it in the conversation as a system message.)
     conversation_messages = []
 
-    # A) If you want a single system message with your big instruction:
-    #    You can either pass it directly to Anthropic as `system=...`
-    #    or do it as a "system" role message in the conversation. 
-    #    We'll illustrate "system" role in the conversation:
+    # System instructions or big context
     conversation_messages.append({
         "role": "assistant",
         "content": (
             "You are an AI chatbot designed to provide insights on the stock "
-            "status of an inventory based on structured data. The inventory includes "
-            "stakeholders, brands, tags, product types, products, and so on. "
-            "You will answer questions about available stock levels, brand inventory, "
-            "and so forth. Be concise and do not add unrelated info."
+            "status of an inventory, as well as the relationships between tags, products, "
+            "brands, and stakeholders (companies). You will answer questions about available "
+            "stock levels, brand inventory, product tags, and more. Be concise."
         )
     })
 
-    # B) Provide inventory data as an assistant message so Claude treats it like
-    #    known context, not user instructions:
-    
+    # -----------------------------------------------------
+    # A) Available products in inventory (existing example)
+    # -----------------------------------------------------
     available_products_qs = (
         Inventory.objects
         .filter(quantity__gt=0)
@@ -92,7 +92,6 @@ def create_prompt(request):
     else:
         inventory_text = "No products currently in stock."
 
-    # Let the assistant "say" the inventory for context:
     conversation_messages.append({
         "role": "assistant",
         "content": (
@@ -101,28 +100,61 @@ def create_prompt(request):
         )
     })
 
-    # C) (Optional) If the user literally typed their name: 
-    #    That can be a user message:
+    # -----------------------------------------------------
+    # B) Tag–Product–Brand–Company listing (NEW part)
+    # -----------------------------------------------------
+    tagged_products_qs = (
+        ProductTag.objects
+        .select_related("tag", "product__brand__stakeholder")  # so we don't hit the DB repeatedly
+        .values(
+            tag_name=F("tag__name"),
+            product_name=F("product__name"),
+            brand_name=F("product__brand__name"),
+            company_name=F("product__brand__stakeholder__name")
+        )
+    )
+
+    if tagged_products_qs.exists():
+        lines = []
+        for row in tagged_products_qs:
+            lines.append(
+                f"Tag: {row['tag_name']}, "
+                f"Product: {row['product_name']}, "
+                f"Brand: {row['brand_name']}, "
+                f"Company: {row['company_name']}"
+            )
+        tag_product_text = "\n".join(lines)
+    else:
+        tag_product_text = "No tag–product–brand data found."
+
+    # Include this as context for the AI:
+    conversation_messages.append({
+        "role": "assistant",
+        "content": (
+            "Here is the current tag–product–brand–company mapping:\n"
+            f"{tag_product_text}"
+        )
+    })
+
+    # (Optional) Some user-provided info
     user_name = created_by.name
     conversation_messages.append({
         "role": "user",
         "content": f"My user name is: {user_name}"
     })
 
-    # D) Now append the existing conversation history with correct roles
+    # D) Insert prior conversation history
     for item in history:
-        # item.prompt.prompt = what the user said
         conversation_messages.append({
             "role": "user",
             "content": item.prompt.prompt
         })
-        # item.content = the AI's response
         conversation_messages.append({
             "role": "assistant",
             "content": item.content
         })
 
-    # E) Append the new user prompt
+    # E) The new user prompt
     conversation_messages.append({
         "role": "user",
         "content": prompt_instance.prompt
@@ -139,23 +171,19 @@ def create_prompt(request):
 
     try:
         response = anthropic.messages.create(
-            model="claude-3-haiku-20240307", 
-            # You could also do system="You are a helpful assistant" here, or skip if
-            # you used a system role message in conversation_messages
+            model="claude-3-haiku-20240307",
             messages=conversation_messages,
             max_tokens=200,
             temperature=0.7
         )
-        # Adjust how you extract the text depending on how the library returns it
+        # Depending on the library version, adapt how you access `response_content`
         response_content = response.content[0].text
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # 7. Save the new assistant response
+    # 7. Save new assistant response
     PromptResponse.objects.create(prompt=prompt_instance, content=response_content)
 
     # 8. Return the assistant response & chat ID
     return Response({"response": response_content, "chat_id": chat.id},
                     status=status.HTTP_201_CREATED)
-
-
