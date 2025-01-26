@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
@@ -14,6 +15,8 @@ class Chat(AuditMixin):
 
     id = models.UUIDField(
         primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
         verbose_name=_("ID del Chat"),
         db_comment=_("Identificador único para el chat.")
     )

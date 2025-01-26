@@ -1,9 +1,11 @@
 from django.urls import path
 
-# from chat.views.chat import ConversationDetailView
+from chat.views.prompt import create_prompt
+
+
 
 
 
 urlpatterns = [ 
-            #    path('claude', ConversationDetailView.create_ConversationDetail),
+               path('claude', create_prompt),
                ]

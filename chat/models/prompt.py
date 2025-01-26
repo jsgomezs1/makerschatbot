@@ -1,6 +1,6 @@
+import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator, MaxValueValidator
 from makerschatbot.clases.abstract.audit_mixin import AuditMixin
 from makerschatbot.variables.schemas import Schema
 from .chat import Chat
@@ -15,6 +15,8 @@ class Prompt(AuditMixin):
 
     id = models.UUIDField(
         primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
         verbose_name=_("Prompt ID"),
         db_comment=_("Unique identifier for the chat prompt")
     )
