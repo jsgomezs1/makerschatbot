@@ -48,7 +48,18 @@ python manage.py migrate
 
 ---
 
-## 5. Ejecutar el Servidor de Desarrollo
+## 5. Variables de entorno
+
+Recuerda añadir a tu archivo .env las siguientes variables:
+
+```bash
+BACKEND_URL = ""
+ANTHROPIC_API_KEY = ""
+```
+
+---
+
+## 6. Ejecutar el Servidor de Desarrollo
 
 Para iniciar el servidor de desarrollo, usa el siguiente comando:
 
@@ -60,3 +71,14 @@ El servidor estará disponible en `http://127.0.0.1:8000/`.
 
 ---
 
+## 7. Ejecutar interfaz de chat
+
+Para interacturar con el chatbot, ejecuta el siguiente comando:
+
+```bash
+python ./view/chat_view.py
+```
+
+El servidor estará disponible en `http://127.0.0.1:7860/`.
+
+---

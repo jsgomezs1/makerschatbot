@@ -1,8 +1,9 @@
 import gradio as gr
 import requests
+import os
 
 def send_message(message, chat_history, chat_id=None):
-    backend_url = "http://127.0.0.1:8000"
+    backend_url = os.getenv("BACKEND_URL") or "http://127.0.0.1:8000"
     user_url = f"{backend_url}/core/users/"
 
     response = requests.get(user_url)
@@ -23,12 +24,11 @@ def send_message(message, chat_history, chat_id=None):
     print(payload)
     headers = {"Content-Type": "application/json"}
     response = requests.post(chat_url, json=payload, headers=headers)
-    if response.status_code == 200:
+    if response.status_code == 201:
         bot_reply = response.json()["response"]
     else:
         bot_reply = f"Error:{response}"
-
-
+        
     chat_history.append(
         gr.ChatMessage(role="user", content=message)
     )
