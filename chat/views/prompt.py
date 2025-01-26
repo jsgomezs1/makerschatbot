@@ -67,27 +67,31 @@ def create_prompt(request):
     
 
     # 5. Build conversation messages (no 'system' role here)
-    conversation_messages = []
+    conversation_messages = [{
+        "role": "user",
+        "content": 'You are an AI chatbot designed to provide insights on the stock status of an inventory based on structured data. The inventory includes the following entities and relationships: Stakeholder: Represents stakeholders associated with brands (e.g., name).  Brand: Represents brands and their stakeholders (e.g., name, stakeholder). Tag: Represents tags that categorize or classify inventory items (e.g., name). Product Type: Represents categories of products (e.g., name). Product: Represents individual products linked to a brand and product type (e.g., name, brand, product type). Product Tag: Tags assigned to specific products for further categorization (e.g., name). Inventory: Represents stock levels for each product (e.g., product, quantity). Response Guidelines: Focus only on the specific query asked by the customer and provide clear, concise, and organized information. Group responses logically by stakeholder, brand, product type, or tag, depending on the query. Do not provide irrelevant information or speculate outside the dataset. Example Queries and Responses: Product-Specific Query: Query: "What is the stock quantity of [product name]?" Response: "There is a total of [quantity] unit of [product name] in stock" Brand-Specific Query: Query: "Show the inventory status for all products under [brand name]." Response: "Stock status of [brand name] products: [list of [product name]: [quantity]]" Tag-Specific Query: Query: "List all products tagged with [tag name] and their stock quantities." Response: "Products tagged with [tag name]: [product name]" Stakeholder-Specific Query: Query: "Show the inventory managed by [stakeholder name]." Response: "Inventory of [stakeholder name]: [list of brand and products]" Product Type Query: Query: "What is the total stock quantity of [product type]?" Response: "There are in stock [number of products] products of type [product type]"'
+    }]
     
-    # available_products = Inventory.objects.get()
     
-    # available_products = (
-    # Inventory.objects
-    # .filter(quantity__gt=0)
-    # .select_related('product')
-    # .values_list('quantity', 'product__name')
-    # )
+    available_products = Inventory.objects.get()
+    
+    available_products = (
+    Inventory.objects
+    .filter(quantity__gt=0)
+    .select_related('product')
+    .values_list('quantity', 'product__name')
+    )
 
-    # # Suppose we want a string where each "row" looks like: "Quantity: X - Product: Y"
-    # # and each row is separated by newline characters (or any other delimiter).
-    # available_products_string = ""
-    # for quantity, name in available_products:
-    #     available_products_string += f"Quantity: {quantity} - Product: {name}\n"
+    # Suppose we want a string where each "row" looks like: "Quantity: X - Product: Y"
+    # and each row is separated by newline characters (or any other delimiter).
+    available_products_string = ""
+    for quantity, name in available_products:
+        available_products_string += f"Quantity: {quantity} - Product: {name}\n"
     
-    # conversation_messages.append({
-    #     "role": "user",
-    #     "content": f'the available products are: {available_products_string}'
-    # })
+    conversation_messages.append({
+        "role": "user",
+        "content": f'the available products are: {available_products_string}'
+    })
     
     
     
