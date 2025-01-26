@@ -1,0 +1,28 @@
+-- Inserción de datos ficticios en la tabla inventory.tag
+INSERT INTO inventory.tag (id, "name")
+VALUES
+  (gen_random_uuid(), 'New Arrival'),
+  (gen_random_uuid(), 'Discount'),
+  (gen_random_uuid(), 'Best Seller'),
+  (gen_random_uuid(), 'Limited Edition'),
+  (gen_random_uuid(), 'Eco-Friendly'),
+  (gen_random_uuid(), 'Handmade'),
+  (gen_random_uuid(), 'Premium Quality'),
+  (gen_random_uuid(), 'Luxury'),
+  (gen_random_uuid(), 'Affordable'),
+  (gen_random_uuid(), 'Trending'),
+  (gen_random_uuid(), 'Exclusive'),
+  (gen_random_uuid(), 'Popular'),
+  (gen_random_uuid(), 'Family-Friendly'),
+  (gen_random_uuid(), 'For Kids'),
+  (gen_random_uuid(), 'Seasonal'),
+  (gen_random_uuid(), 'Outdoor Use'),
+  (gen_random_uuid(), 'Indoor Use'),
+  (gen_random_uuid(), 'Durable'),
+  (gen_random_uuid(), 'Portable'),
+  (gen_random_uuid(), 'Smart Device'),
+  (gen_random_uuid(), 'Refurbished'),
+  (gen_random_uuid(), 'Wireless'),
+  (gen_random_uuid(), 'Waterproof'),
+  (gen_random_uuid(), 'Energy Efficient'),
+  (gen_random_uuid(), 'Customizable');
