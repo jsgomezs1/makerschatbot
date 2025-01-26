@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 import uuid
 
-class Stakeholder(AuditMixin):
+class Stakeholder(models.Model):
     """
     Tercero
 

@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 import uuid
 
-class ProductTag(AuditMixin):
+class ProductTag(models.Model):
     """
     Modelo que representa la relación entre un Producto y una Etiqueta.
 

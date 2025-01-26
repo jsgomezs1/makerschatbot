@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 import uuid
 
-class ProductType(AuditMixin):
+class ProductType(models.Model):
     """
     Modelo que representa un Tipo de Producto en el sistema.
 
