@@ -21,49 +21,41 @@ class PromptSerializer(ModelSerializer):
 
 @api_view(["POST"])
 def create_prompt(request):
-    # 2. Use the refined serializer
     serializer = PromptSerializer(data=request.data)
 
     if serializer.is_valid():
-        
-        created_by = User.objects.get(id= request.data["created_by"])
-        
-        # 3. Create the Chat object
-        chat = Chat.objects.create(name="New Chat",created_by=created_by)
-
-        # 4. Save prompt with this chat
+        created_by = User.objects.get(id=request.data["created_by"])
+        chat = Chat.objects.create(name="New Chat", created_by=created_by)
         prompt_instance = serializer.save(chat=chat)
 
-        # 5. Prepare the anthropic API call
         api_key = os.getenv("ANTHROPIC_API_KEY")
         anthropic = Anthropic(api_key=api_key)
 
-        # 6. Format the prompt text
-        formatted_prompt = f"{HUMAN_PROMPT} {prompt_instance.prompt}{AI_PROMPT}"
-
-        # 7. Call the API
         try:
-            response = anthropic.chat.create(
-                model="claude-3-haiku-20240307",  # allowed in the Chat/Messages API
+            # Corrected API call using messages.create
+            response = anthropic.messages.create(
+                model="claude-3-haiku-20240307",
+                system="You are a helpful assistant.",  # System prompt as parameter
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": prompt_instance.prompt},
+                    {"role": "user", "content": prompt_instance.prompt}  # User message
                 ],
-                max_tokens_to_sample=100,
-                temperature=0.7,
+                max_tokens=100,  # Correct parameter name
+                temperature=0.7
             )
+            
+            # Extract text content from response
+            response_content = response.content[0].text
+
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-        # 8. Save the response
+        # Save the extracted response text
         PromptResponse.objects.create(
-            prompt=prompt_instance, 
-            content=response  # or whatever portion of the response is needed
+            prompt=prompt_instance,
+            content=response_content
         )
 
-        # 9. Return the response
-        return Response(response, status=status.HTTP_201_CREATED)
+        # Return the response content
+        return Response({"response": response_content}, status=status.HTTP_201_CREATED)
 
-    # Handle invalid data
-    return Response({"error": "Invalid data provided."}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

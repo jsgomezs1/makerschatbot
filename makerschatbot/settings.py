@@ -86,7 +86,7 @@ DATABASES = {
         "NAME": "ecommerce_chat",
         "USER": "postgres",
         "PASSWORD": "admin",
-        "HOST": "192.168.100.164",
+        "HOST": "192.168.0.4",
         "PORT": "5432",
             'OPTIONS': {
     'options': (
