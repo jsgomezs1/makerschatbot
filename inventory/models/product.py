@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 import uuid
 
-class Product(AuditMixin):
+class Product(models.Model):
     """
     Producto.
 

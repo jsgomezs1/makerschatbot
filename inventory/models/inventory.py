@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 import uuid
 
-class Inventory(AuditMixin):
+class Inventory(models.Model):
     """
     Modelo que representa el Inventario de un Producto en el sistema.
 
