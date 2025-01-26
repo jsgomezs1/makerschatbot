@@ -1,2 +1,3 @@
-from .conversation import Conversation
-from .conversation_detail import ConversationDetail
+from .chat import Chat
+from .prompt import Prompt
+from.response import Response

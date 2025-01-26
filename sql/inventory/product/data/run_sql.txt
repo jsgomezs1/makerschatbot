@@ -1,0 +1,2 @@
+sql=readsqlfile('inventory/product/data/insert_product'),  
+reverse_sql=readsqlfile('inventory/product/data/delete_product')  

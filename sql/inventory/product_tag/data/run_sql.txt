@@ -1,0 +1,8 @@
+from django.db import migrations
+
+from makerschatbot.functions.read_sql_file import readsqlfile
+          
+migrations.RunSQL(
+            sql=readsqlfile('inventory/brand/data/create_brands'),  
+            reverse_sql=readsqlfile('inventory/brand/data/delete_brands') 
+        )
