@@ -28,7 +28,6 @@ class PromptSerializer(ModelSerializer):
 @api_view(["POST"])
 @transaction.atomic
 def create_prompt(request):
-    """Create a new Prompt under an existing or new Chat."""
     serializer = PromptSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -52,50 +51,53 @@ def create_prompt(request):
         # Create a new chat
         chat = Chat.objects.create(name="New Chat", created_by=created_by)
 
-    # 3. Save the new Prompt (linking it to the Chat and user)
+    # 3. Save the new Prompt
     prompt_instance = serializer.save(chat=chat, created_by=created_by)
 
-    # 4. Fetch conversation history for the selected/new chat
+    # 4. Fetch conversation history
     history = PromptResponse.objects.select_related(
         "prompt",
         "prompt__chat"
-    ).filter(
-        prompt__chat=chat
-    )
-    
-    
-    
+    ).filter(prompt__chat=chat)
 
-    # 5. Build conversation messages (no 'system' role here)
-    conversation_messages = []
-    
-    # available_products = Inventory.objects.get()
-    
-    # available_products = (
-    # Inventory.objects
-    # .filter(quantity__gt=0)
-    # .select_related('product')
-    # .values_list('quantity', 'product__name')
-    # )
-
-    # # Suppose we want a string where each "row" looks like: "Quantity: X - Product: Y"
-    # # and each row is separated by newline characters (or any other delimiter).
-    # available_products_string = ""
-    # for quantity, name in available_products:
-    #     available_products_string += f"Quantity: {quantity} - Product: {name}\n"
-    
-    # conversation_messages.append({
-    #     "role": "user",
-    #     "content": f'the available products are: {available_products_string}'
-    # })
-    
-    
-    
-    user_name = User.objects.get(id=created_by_id).name
-    conversation_messages.append({
+    # 5. Build conversation messages
+    conversation_messages = [
+        {
             "role": "user",
-            "content": f'my user name is: {user_name}'
-        })
+            "content": (
+                "You are an AI chatbot designed to provide insights on the stock "
+                "status of an inventory based on structured data ..."
+            )
+        }
+    ]
+
+    # **Remove** the get() that caused the error
+    # available_products = Inventory.objects.get()  # <-- Remove this line
+
+    # **Use a filtered QuerySet to get all inventory items with quantity > 0**
+    available_products = (
+        Inventory.objects
+        .filter(quantity__gt=0)
+        .select_related('product')
+        .values_list('quantity', 'product__name')
+    )
+
+    # Build a string of available products
+    available_products_string = ""
+    for quantity, name in available_products:
+        available_products_string += f"Quantity: {quantity} - Product: {name}\n"
+
+    conversation_messages.append({
+        "role": "user",
+        "content": f"The available products are: \n{available_products_string}"
+    })
+
+    user_name = created_by.name
+    conversation_messages.append({
+        "role": "user",
+        "content": f"My user name is: {user_name}"
+    })
+
     for item in history:
         # user prompt
         conversation_messages.append({
@@ -123,28 +125,26 @@ def create_prompt(request):
         )
     anthropic = Anthropic(api_key=api_key)
 
-    # 8. Call the Anthropic model
+    # 8. Call the Anthropic model (adjust model name, messages structure, etc. as needed)
     try:
         response = anthropic.messages.create(
             model="claude-3-haiku-20240307",
-            # Provide a top-level system message (if desired) rather than a 'system' role
             system="You are a helpful assistant.",
             messages=conversation_messages,
             max_tokens=100,
             temperature=0.7
         )
-        response_content = response.content[0].text  # Adjust if necessary
+        # The way you extract the response from 'response' may need adjustment
+        response_content = response.content[0].text
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # 9. Save the new assistant response
-    PromptResponse.objects.create(
-        prompt=prompt_instance,
-        content=response_content
-    )
+    PromptResponse.objects.create(prompt=prompt_instance, content=response_content)
 
     # 10. Return the assistant response & chat ID
     return Response(
         {"response": response_content, "chat_id": chat.id},
         status=status.HTTP_201_CREATED
     )
+
